@@ -1,0 +1,23 @@
+{
+    "appKeys": {},
+    "capabilities": [
+        ""
+    ],
+    "companyName": "roneythomas6@gmail.com",
+    "enableMultiJS": true,
+    "longName": "Punch Time",
+    "projectType": "native",
+    "resources": {
+        "media": []
+    },
+    "sdkVersion": "3",
+    "shortName": "Punch Time",
+    "targetPlatforms": [
+        "basalt"
+    ],
+    "uuid": "1a7a6bb5-39ee-44ae-9887-c4ca3957338d",
+    "versionLabel": "1.0",
+    "watchapp": {
+        "watchface": false
+    }
+}
