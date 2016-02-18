@@ -11,19 +11,13 @@ typedef struct {
 } Context;
 
 Window *window;
-static TextLayer *s_time_layer;
+static TextLayer *s_time_layer, *punch_time_layer_1, *punch_time_layer_2, *punch_time_layer_3, *punch_time_layer_4;
 
 static ActionMenu *s_action_menu;
 static ActionMenuLevel *s_root_level;
 
-//ActionFunc
-static void punch_now() {
-
-}
-
-static void edit_time() {
-
-}
+static int key = 0;
+static char clock_string[20];
 
 //ActionMenu
 static void action_performed_callback(ActionMenu *action_menu,
@@ -32,11 +26,23 @@ static void action_performed_callback(ActionMenu *action_menu,
     MenuType type = (MenuType) action_menu_item_get_action_data(action);
     switch (type) {
         case PunchNow:
-            punch_now();
+            key++;
+            if (key == 1) {
+                clock_copy_time_string(clock_string, 20);
+                text_layer_set_text(punch_time_layer_1, clock_string);
+            } else if (key == 2) {
+                clock_copy_time_string(clock_string, 20);
+                text_layer_set_text(punch_time_layer_2, clock_string);
+            } else if (key == 3) {
+                clock_copy_time_string(clock_string, 20);
+                text_layer_set_text(punch_time_layer_3, clock_string);
+            } else if (key == 4) {
+                clock_copy_time_string(clock_string, 20);
+                text_layer_set_text(punch_time_layer_4, clock_string);
+            }
             APP_LOG(APP_LOG_LEVEL_DEBUG, "PunchTime Selected %d", 0);
             break;
         case EditTime:
-            edit_time();
             APP_LOG(APP_LOG_LEVEL_DEBUG, "EditTime Selected %d", 1);
             break;
     }
@@ -89,7 +95,12 @@ static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
 static void main_window_load(Window *window) {
     GRect bounds = layer_get_bounds(window_get_root_layer(window));
     window_set_click_config_provider(window, click_config_provider);
-    s_time_layer = text_layer_create(GRect(0, PBL_IF_ROUND_ELSE(58, 52), bounds.size.w, 50));
+    //TextLayer Create
+    s_time_layer = text_layer_create(GRect(0, PBL_IF_ROUND_ELSE(58, 22), bounds.size.w, 50));
+    punch_time_layer_1 = text_layer_create(GRect(0, PBL_IF_ROUND_ELSE(108, 72), bounds.size.w, 14));
+    punch_time_layer_2 = text_layer_create(GRect(0, PBL_IF_ROUND_ELSE(118, 86), bounds.size.w, 14));
+    punch_time_layer_3 = text_layer_create(GRect(0, PBL_IF_ROUND_ELSE(128, 100), bounds.size.w, 14));
+    punch_time_layer_4 = text_layer_create(GRect(0, PBL_IF_ROUND_ELSE(138, 114), bounds.size.w, 14));
 
     //TimeLayer
     text_layer_set_background_color(s_time_layer, GColorClear);
@@ -97,12 +108,30 @@ static void main_window_load(Window *window) {
     text_layer_set_font(s_time_layer, fonts_get_system_font(FONT_KEY_LECO_32_BOLD_NUMBERS));
     text_layer_set_text_alignment(s_time_layer, GTextAlignmentCenter);
 
+    //PunchTimeLayer
+    text_layer_set_text_color(punch_time_layer_1, GColorBlack);
+    text_layer_set_text_color(punch_time_layer_2, GColorBlack);
+    text_layer_set_text_color(punch_time_layer_3, GColorBlack);
+    text_layer_set_text_color(punch_time_layer_4, GColorBlack);
+    text_layer_set_text_alignment(punch_time_layer_1, GTextAlignmentCenter);
+    text_layer_set_text_alignment(punch_time_layer_2, GTextAlignmentCenter);
+    text_layer_set_text_alignment(punch_time_layer_3, GTextAlignmentCenter);
+    text_layer_set_text_alignment(punch_time_layer_4, GTextAlignmentCenter);
+
     // Add  child layer to the Window's root layer
     layer_add_child(window_get_root_layer(window), text_layer_get_layer(s_time_layer));
+    layer_add_child(window_get_root_layer(window), text_layer_get_layer(punch_time_layer_1));
+    layer_add_child(window_get_root_layer(window), text_layer_get_layer(punch_time_layer_2));
+    layer_add_child(window_get_root_layer(window), text_layer_get_layer(punch_time_layer_3));
+    layer_add_child(window_get_root_layer(window), text_layer_get_layer(punch_time_layer_4));
 }
 
 static void main_window_unload(Window *window) {
     text_layer_destroy(s_time_layer);
+    text_layer_destroy(punch_time_layer_1);
+    text_layer_destroy(punch_time_layer_2);
+    text_layer_destroy(punch_time_layer_3);
+    text_layer_destroy(punch_time_layer_4);
 }
 
 void init() {
