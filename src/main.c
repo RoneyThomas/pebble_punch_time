@@ -33,21 +33,27 @@ static char clock_string_1[6], clock_string_2[6], clock_string_3[6], clock_strin
 
 static void send() {
     DictionaryIterator *iter;
-    app_message_outbox_begin(&iter);
-    dict_write_cstring(iter, DATE_KEY, data_string);
-    if (strcmp(clock_string_1, "")) {
-        dict_write_cstring(iter, CLOCK_KEY_1, clock_string_1);
+    AppMessageResult result = app_message_outbox_begin(&iter);
+    if(result == APP_MSG_OK) {
+        // Construct the message
+        dict_write_cstring(iter, DATE_KEY, data_string);
+        if (strcmp(clock_string_1, "")) {
+            dict_write_cstring(iter, CLOCK_KEY_1, clock_string_1);
+        }
+        if (strcmp(clock_string_2, "")) {
+            dict_write_cstring(iter, CLOCK_KEY_2, clock_string_2);
+        }
+        if (strcmp(clock_string_3, "")) {
+            dict_write_cstring(iter, CLOCK_KEY_3, clock_string_3);
+        }
+        if (strcmp(clock_string_4, "")) {
+            dict_write_cstring(iter, CLOCK_KEY_4, clock_string_4);
+        }
+        app_message_outbox_send();
+    } else {
+        // The outbox cannot be used right now
+        APP_LOG(APP_LOG_LEVEL_ERROR, "Error preparing the outbox: %d", (int) result);
     }
-    if (strcmp(clock_string_2, "")) {
-        dict_write_cstring(iter, CLOCK_KEY_2, clock_string_2);
-    }
-    if (strcmp(clock_string_3, "")) {
-        dict_write_cstring(iter, CLOCK_KEY_3, clock_string_3);
-    }
-    if (strcmp(clock_string_4, "")) {
-        dict_write_cstring(iter, CLOCK_KEY_4, clock_string_4);
-    }
-    app_message_outbox_send();
 }
 
 void get_date() {
@@ -67,19 +73,23 @@ static void action_performed_callback(ActionMenu *action_menu,
             if (key == 1) {
                 clock_copy_time_string(clock_string_1, 6);
                 APP_LOG(APP_LOG_LEVEL_DEBUG, "PunchTime Layer %d", 1);
+                persist_write_string(CLOCK_KEY_1, clock_string_1);
                 text_layer_set_text(punch_time_layer_1, clock_string_1);
                 get_date();
             } else if (key == 2) {
                 clock_copy_time_string(clock_string_2, 6);
                 APP_LOG(APP_LOG_LEVEL_DEBUG, "PunchTime Layer %d", 2);
+                persist_write_string(CLOCK_KEY_2, clock_string_2);
                 text_layer_set_text(punch_time_layer_2, clock_string_2);
             } else if (key == 3) {
                 clock_copy_time_string(clock_string_3, 6);
                 APP_LOG(APP_LOG_LEVEL_DEBUG, "PunchTime Layer %d", 3);
+                persist_write_string(CLOCK_KEY_3, clock_string_3);
                 text_layer_set_text(punch_time_layer_3, clock_string_3);
             } else if (key == 4) {
                 clock_copy_time_string(clock_string_4, 6);
                 APP_LOG(APP_LOG_LEVEL_DEBUG, "PunchTime Layer %d", 4);
+                persist_write_string(CLOCK_KEY_4, clock_string_4);
                 text_layer_set_text(punch_time_layer_4, clock_string_4);
                 key = 0;
             }
@@ -222,6 +232,15 @@ static void outbox_failed_callback(DictionaryIterator *iterator, AppMessageResul
 
 static void outbox_sent_callback(DictionaryIterator *iterator, void *context) {
     APP_LOG(APP_LOG_LEVEL_INFO, "Outbox send success! %d", 0);
+    APP_LOG(APP_LOG_LEVEL_INFO, "Now delete all persists %d", 1);
+    persist_delete(CLOCK_KEY_1);
+    persist_delete(CLOCK_KEY_2);
+    persist_delete(CLOCK_KEY_3);
+    persist_delete(CLOCK_KEY_4);
+//    text_layer_set_text(punch_time_layer_1, "");
+//    text_layer_set_text(punch_time_layer_2, "");
+//    text_layer_set_text(punch_time_layer_3, "");
+//    text_layer_set_text(punch_time_layer_4, "");
 }
 
 
